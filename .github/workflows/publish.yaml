@@ -1,0 +1,57 @@
+name: porter-bundle-publish
+
+on:
+  push:
+    branches:
+      - "*"
+    tags:
+      - v*
+
+# Set up environment variables needed for the bundle.
+# If these are sensitive, they should be set as secrets in the repository.
+# To do this, go to settings -> secrets -> new secret.
+env:
+  REGISTRY: ghcr.io
+
+# A workflow can be made of many jobs, but this example puts all the steps under one job.
+jobs:
+  # Publish is the name of this job.
+  publish:
+    if: github.event_name == 'push'
+    # Specify the type of machine you want the job to run on. We chose ubuntu-latest.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out code
+      - uses: actions/checkout@v1
+      # Use Porter GH action to set up Porter.
+      # You can specify the version of Porter that you want installed by adding the lines for with and porter_version as explained above.
+      - name: Setup Porter
+        uses: getporter/gh-action@v0.1.3
+        with:
+          porter_version: v1.0.0-alpha.20
+      - name: Install Porter mixins
+        run: |
+          porter mixins install gcloud
+          porter mixins install terraform
+      # Run install
+      #- name: Porter install
+      #  run: porter install
+      # Run upgrade
+      #- name: Porter upgrade
+      #  run: porter upgrade
+      # Run uninstall
+      #- name: Porter uninstall
+      #  run: porter uninstall
+      # Login to github container registry to publish the bundle
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/sgettys/porter-agent:${{ env.VERSION }}
