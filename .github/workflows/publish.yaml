@@ -54,4 +54,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/sgettys/porter-agent:${{ env.VERSION }}
+          tags: ${{ env.REGISTRY }}/sgettys/porter-debian:${{ env.VERSION }}
