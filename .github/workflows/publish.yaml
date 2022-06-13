@@ -12,7 +12,7 @@ on:
 # To do this, go to settings -> secrets -> new secret.
 env:
   REGISTRY: ghcr.io
-  VERSION: v0.0.1
+  VERSION: v0.0.2
 
 # A workflow can be made of many jobs, but this example puts all the steps under one job.
 jobs:
